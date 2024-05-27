@@ -1,40 +1,41 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class CharacterManager : MonoBehaviour
+public class CampFire : MonoBehaviour
 {
-    private static CharacterManager _instance;
-    public static CharacterManager Instance
+    public int damage;
+    public float damageRate;
+
+    List<IDamagable> things = new List<IDamagable>();
+
+    // Start is called before the first frame update
+    void Start()
     {
-        get
+        InvokeRepeating("DealDamage",0,damageRate);
+    }
+
+    void DealDamage()
+    {
+        for (int i = 0; i < things.Count; i++)
         {
-            if (_instance == null)
-            {
-                _instance = new GameObject("CharacterManager").AddComponent<CharacterManager>();
-            }
-            return _instance;
+            things[i].TakePhysicalDamage(damage);
         }
     }
 
-    private Player _player;
-    public Player Player
+    private void OnTriggerEnter(Collider other)
     {
-        get { return _player; }
-        set { _player = value;}
+        if (other.TryGetComponent(out IDamagable damagable))
+        {
+            things.Add(damagable);
+        }
     }
 
-    private void Awake()
+    private void OnTriggerExit(Collider other)
     {
-        if(_instance != null)
+        if (other.TryGetComponent(out IDamagable damagable))
         {
-            _instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            if (_instance != this)
-            {
-                Destroy(gameObject);
-            }
+            things.Remove(damagable);
         }
     }
 }
