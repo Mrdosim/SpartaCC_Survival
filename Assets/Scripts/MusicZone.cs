@@ -29,8 +29,7 @@ public class MusicZone : MonoBehaviour
         if (other.CompareTag("Player"))
             targetVolume = maxVolume;
     }
-
-    private void OnTriggerExit(Collider other)
+        private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player"))
             targetVolume = 0.0f;

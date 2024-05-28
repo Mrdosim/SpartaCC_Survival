@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 public enum AIState
 {
@@ -43,6 +45,7 @@ public class NPC : MonoBehaviour, IDamagable
     private NavMeshAgent agent;
     private Animator animator;
     private SkinnedMeshRenderer[] meshRenderers;
+    public event Action onTakeDamage;
 
     private void Awake()
     {
@@ -102,7 +105,7 @@ public class NPC : MonoBehaviour, IDamagable
         if (aiState == AIState.Wandering && agent.remainingDistance < 0.1f)
         {
             SetState(AIState.Idle);
-            Invoke("WanderToNewLocation", Random.Range(minWanderWaitTime, maxWanderWaitTime));
+            Invoke("WanderToNewLocation", UnityEngine.Random.Range(minWanderWaitTime, maxWanderWaitTime));
         }
 
         if (playerDistance < detectDistance)
@@ -172,7 +175,7 @@ public class NPC : MonoBehaviour, IDamagable
     {
         NavMeshHit hit;
 
-        NavMesh.SamplePosition(transform.position + (Random.onUnitSphere * Random.Range(minWanderDistance, maxWanderDistance)), out hit, maxWanderDistance, NavMesh.AllAreas);
+        NavMesh.SamplePosition(transform.position + (UnityEngine.Random.onUnitSphere * Random.Range(minWanderDistance, maxWanderDistance)), out hit, maxWanderDistance, NavMesh.AllAreas);
 
         int i = 0;
         while (Vector3.Distance(transform.position, hit.position) < detectDistance)
@@ -191,7 +194,7 @@ public class NPC : MonoBehaviour, IDamagable
         health -= damageAmount;
         if (health <= 0)
             Die();
-
+        onTakeDamage?.Invoke();
         StartCoroutine(DamageFlash());
     }
 

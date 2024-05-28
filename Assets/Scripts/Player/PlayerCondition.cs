@@ -20,6 +20,13 @@ public class PlayerCondition : MonoBehaviour, IDamagable
 
     public event Action onTakeDamage;
 
+    private Rigidbody rigidbody;
+
+    private void Awake()
+    {
+        rigidbody = GetComponent<Rigidbody>();
+    }
+
     void Update()
     {
         hunger.Subtract(hunger.passiveValue * Time.deltaTime);
@@ -55,6 +62,12 @@ public class PlayerCondition : MonoBehaviour, IDamagable
     {
         health.Subtract(damage);
         onTakeDamage?.Invoke();
+        if (rigidbody != null)
+        {
+            Vector3 velocity = rigidbody.velocity;
+            velocity.y = Mathf.Clamp(velocity.y, 0, float.MaxValue); // 수직 속도를 제한
+            rigidbody.velocity = velocity;
+        }
     }
 
     public bool UseStamina(float amount)
