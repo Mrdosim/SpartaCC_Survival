@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     public float moveSpeed;
+    public float sprintMultiplier = 2.0f;
     private Vector2 curMovementInput;
     public float jumpForce;
     public LayerMask groundLayerMask;
@@ -45,6 +46,14 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         Move();
+        if (isSprinting && IsGrounded())
+        {
+            if (!condition.UseStamina(7 * Time.fixedDeltaTime))
+            {
+                isSprinting = false;
+                UpdateMoveSpeed();
+            }
+        }
     }
 
     private void LateUpdate()
@@ -92,16 +101,18 @@ public class PlayerController : MonoBehaviour
         if (context.phase == InputActionPhase.Performed)
         {
             isSprinting = true;
+            UpdateMoveSpeed();
         }
         else if (context.phase == InputActionPhase.Canceled)
         {
             isSprinting = false;
+            UpdateMoveSpeed();
         }
     }
 
     public void OnInventory(InputAction.CallbackContext context)
     {
-        if(context.phase == InputActionPhase.Started)
+        if (context.phase == InputActionPhase.Started)
         {
             inventory?.Invoke();
             ToggleCursor();
@@ -111,15 +122,14 @@ public class PlayerController : MonoBehaviour
     private void Move()
     {
         Vector3 dir = transform.forward * curMovementInput.y + transform.right * curMovementInput.x;
-        dir *= isSprinting && IsGrounded()? moveSpeed * 2 : moveSpeed;
+        dir *= moveSpeed;
         dir.y = rigidbody.velocity.y;
 
         rigidbody.velocity = dir;
-
-        if (isSprinting)
-        {
-            condition.uiCondition.stamina.Subtract(20 * Time.deltaTime);
-        }
+    }
+    void UpdateMoveSpeed()
+    {
+        moveSpeed = isSprinting ? moveSpeed * sprintMultiplier : moveSpeed / sprintMultiplier;
     }
 
     void CameraLook()
@@ -156,7 +166,7 @@ public class PlayerController : MonoBehaviour
     void ToggleCursor()
     {
         bool toggle = Cursor.lockState == CursorLockMode.Locked;
-        Cursor.lockState = toggle? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
         canLook = !toggle;
     }
 }
