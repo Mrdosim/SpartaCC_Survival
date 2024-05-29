@@ -14,11 +14,14 @@ public class Player : MonoBehaviour
 
     public Transform dropPosition;
 
+    public Animator animator;
+
     private void Awake()
     {
         CharacterManager.Instance.Player = this;
         controller = GetComponent<PlayerController>();
         condition = GetComponent<PlayerCondition>();
         equip = GetComponent<Equipment>();
+        animator = GetComponent<Animator>();
     }
 }

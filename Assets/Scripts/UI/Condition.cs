@@ -9,6 +9,10 @@ public class Condition : MonoBehaviour
     public float startValue;
     public float maxValue;
     public float passiveValue;
+    public float speedValue;
+    public float jumpCountValue;
+    public float jumpPowerValue;
+
     public Image uiBar;
     void Start()
     {

@@ -1,7 +1,7 @@
 using System;
+using UnityChan;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.EnhancedTouch;
 
 public class PlayerController : MonoBehaviour
 {
@@ -24,36 +24,33 @@ public class PlayerController : MonoBehaviour
     public Action inventory;
     private Vector2 mouseDelta;
 
-
     [HideInInspector]
     private int _jumpCount;
-    private bool isSprinting;
+    public bool isSprinting;
 
     private Rigidbody rigidbody;
-    public PlayerCondition condition;
+    private Transform mainCameraTransform;
+    public float originalMoveSpeed;
+    private Transform originalParent;
+
+    private CameraController cameraController;
 
     private void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
+        mainCameraTransform = Camera.main.transform;
+        cameraController = mainCameraTransform.GetComponent<CameraController>();
     }
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
-        condition = CharacterManager.Instance.Player.condition;
+        originalMoveSpeed = moveSpeed;
     }
 
     private void FixedUpdate()
     {
         Move();
-        if (isSprinting && IsGrounded())
-        {
-            if (!condition.UseStamina(7 * Time.fixedDeltaTime))
-            {
-                isSprinting = false;
-                UpdateMoveSpeed();
-            }
-        }
     }
 
     private void LateUpdate()
@@ -74,9 +71,11 @@ public class PlayerController : MonoBehaviour
         if (context.phase == InputActionPhase.Performed)
         {
             curMovementInput = context.ReadValue<Vector2>();
+            CharacterManager.Instance.Player.animator.SetBool("isWalking", true);
         }
         else if (context.phase == InputActionPhase.Canceled)
         {
+            CharacterManager.Instance.Player.animator.SetBool("isWalking", false);
             curMovementInput = Vector2.zero;
         }
     }
@@ -87,6 +86,7 @@ public class PlayerController : MonoBehaviour
         {
             if (IsGrounded() || _jumpCount < maxJumpCount)
             {
+                CharacterManager.Instance.Player.animator.SetTrigger("isJumping");
                 Vector3 velocity = rigidbody.velocity;
                 velocity.y = 0;
                 rigidbody.velocity = velocity;
@@ -101,12 +101,12 @@ public class PlayerController : MonoBehaviour
         if (context.phase == InputActionPhase.Performed)
         {
             isSprinting = true;
-            UpdateMoveSpeed();
+            CharacterManager.Instance.Player.animator.SetBool("isRunning", true);
         }
         else if (context.phase == InputActionPhase.Canceled)
         {
             isSprinting = false;
-            UpdateMoveSpeed();
+            CharacterManager.Instance.Player.animator.SetBool("isRunning", false);
         }
     }
 
@@ -121,15 +121,46 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
-        Vector3 dir = transform.forward * curMovementInput.y + transform.right * curMovementInput.x;
-        dir *= moveSpeed;
-        dir.y = rigidbody.velocity.y;
+        Vector3 forward = mainCameraTransform.forward;
+        Vector3 right = mainCameraTransform.right;
+        forward.y = 0f;
+        right.y = 0f;
+        forward.Normalize();
+        right.Normalize();
 
-        rigidbody.velocity = dir;
+        Vector3 moveDirection = forward * curMovementInput.y + right * curMovementInput.x;
+
+        if (moveDirection != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+        }
+
+        moveDirection *= moveSpeed;
+        moveDirection.y = rigidbody.velocity.y;
+
+        rigidbody.velocity = moveDirection;
+        UpdateMoveSpeed();
     }
+
     void UpdateMoveSpeed()
     {
-        moveSpeed = isSprinting ? moveSpeed * sprintMultiplier : moveSpeed / sprintMultiplier;
+        if (isSprinting && IsGrounded())
+        {
+            if (CharacterManager.Instance.Player.condition.UseStamina(15 * Time.deltaTime))
+            {
+                moveSpeed = originalMoveSpeed * sprintMultiplier;
+            }
+            else
+            {
+                isSprinting = false;
+                moveSpeed = originalMoveSpeed;
+            }
+        }
+        else if (!isSprinting)
+        {
+            moveSpeed = originalMoveSpeed;
+        }
     }
 
     void CameraLook()
@@ -145,10 +176,10 @@ public class PlayerController : MonoBehaviour
     {
         Ray[] rays = new Ray[4]
         {
-        new Ray(transform.position + (transform.forward * 0.2f) + (transform.up * 0.5f), Vector3.down),
-        new Ray(transform.position + (-transform.forward * 0.2f) + (transform.up * 0.5f), Vector3.down),
-        new Ray(transform.position + (transform.right * 0.2f) + (transform.up * 0.5f), Vector3.down),
-        new Ray(transform.position + (-transform.right * 0.2f) + (transform.up * 0.5f), Vector3.down)
+            new Ray(transform.position + (transform.forward * 0.2f) + (transform.up * 0.5f), Vector3.down),
+            new Ray(transform.position + (-transform.forward * 0.2f) + (transform.up * 0.5f), Vector3.down),
+            new Ray(transform.position + (transform.right * 0.2f) + (transform.up * 0.5f), Vector3.down),
+            new Ray(transform.position + (-transform.right * 0.2f) + (transform.up * 0.5f), Vector3.down)
         };
 
         for (int i = 0; i < rays.Length; i++)
@@ -168,5 +199,23 @@ public class PlayerController : MonoBehaviour
         bool toggle = Cursor.lockState == CursorLockMode.Locked;
         Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
         canLook = !toggle;
+        cameraController.canMove = !toggle;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("MovingPlatform"))
+        {
+            originalParent = transform.parent;
+            transform.SetParent(collision.transform);
+        }
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("MovingPlatform"))
+        {
+            transform.SetParent(originalParent);
+        }
     }
 }

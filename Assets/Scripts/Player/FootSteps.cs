@@ -9,6 +9,7 @@ public class FootSteps : MonoBehaviour
     private Rigidbody _rigidbody;
     public float footstepThreshold;
     public float footstepRate;
+    public float sprintFootstepRate;
     private float footStepTime;
 
     private void Start()
@@ -23,7 +24,8 @@ public class FootSteps : MonoBehaviour
         {
             if (_rigidbody.velocity.magnitude > footstepThreshold)
             {
-                if (Time.time - footStepTime > footstepRate)
+                float currentFootstepRate = CharacterManager.Instance.Player.controller.isSprinting ? sprintFootstepRate : footstepRate; 
+                if (Time.time - footStepTime > currentFootstepRate)
                 {
                     footStepTime = Time.time;
                     audioSource.PlayOneShot(footstepClips[Random.Range(0, footstepClips.Length)]);

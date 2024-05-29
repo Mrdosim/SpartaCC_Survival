@@ -11,6 +11,7 @@ public interface IDamagable
 public class PlayerCondition : MonoBehaviour, IDamagable
 {
     public UICondition uiCondition;
+    public TimerUI timerUI;
 
     Condition health { get { return uiCondition.health; } }
     Condition hunger { get { return uiCondition.hunger; } }
@@ -51,6 +52,45 @@ public class PlayerCondition : MonoBehaviour, IDamagable
     public void Eat(float amount)
     {
         hunger.Add(amount);
+    }
+
+    public void SpeedUp(float amount, float duration)
+    {
+        StartCoroutine(TemporarySpeedUp(amount, duration));
+    }
+
+    private IEnumerator TemporarySpeedUp(float amount, float duration)
+    {
+        CharacterManager.Instance.Player.controller.originalMoveSpeed += amount;
+        timerUI.StartTimer(duration);
+        yield return new WaitForSeconds(duration);
+        CharacterManager.Instance.Player.controller.originalMoveSpeed -= amount;
+    }
+
+    public void IncreaseJumpCount(float amount, float duration)
+    {
+        StartCoroutine(TemporaryIncreaseJumpCount(amount, duration));
+    }
+
+    private IEnumerator TemporaryIncreaseJumpCount(float amount, float duration)
+    {
+        CharacterManager.Instance.Player.controller.maxJumpCount += (int)amount;
+        timerUI.StartTimer(duration);
+        yield return new WaitForSeconds(duration);
+        CharacterManager.Instance.Player.controller.maxJumpCount -= (int)amount;
+    }
+
+    public void IncreaseJumpPower(float amount, float duration)
+    {
+        StartCoroutine(TemporaryIncreaseJumpPower(amount, duration));
+    }
+
+    private IEnumerator TemporaryIncreaseJumpPower(float amount, float duration)
+    {
+        CharacterManager.Instance.Player.controller.jumpForce += amount;
+        timerUI.StartTimer(duration);
+        yield return new WaitForSeconds(duration);
+        CharacterManager.Instance.Player.controller.jumpForce -= amount;
     }
 
     public void Die()
