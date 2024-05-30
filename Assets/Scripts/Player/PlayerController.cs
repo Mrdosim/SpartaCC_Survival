@@ -201,21 +201,4 @@ public class PlayerController : MonoBehaviour
         canLook = !toggle;
         cameraController.canMove = !toggle;
     }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("MovingPlatform"))
-        {
-            originalParent = transform.parent;
-            transform.SetParent(collision.transform);
-        }
-    }
-
-    void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("MovingPlatform"))
-        {
-            transform.SetParent(originalParent);
-        }
-    }
 }

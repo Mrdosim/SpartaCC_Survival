@@ -3,52 +3,59 @@ using System.Collections;
 
 public class MovingBoat : MonoBehaviour
 {
-    public Transform[] points;
-    public float speed = 2f;
-    public float waitTime = 1f;
+    [SerializeField]
+    private WaypointPath _waypointPath;
 
-    private int currentPointIndex = 0;
-    private bool waiting = false;
-    private bool forward = true;
+    [SerializeField]
+    private float _speed;
 
-    void Update()
+    private int _targetWaypointIndex;
+
+    private Transform _previousWaypoint;
+    private Transform _targetWaypoint;
+
+    private float _timeToWaypoint;
+    private float _elapsedTime;
+
+    void Start()
     {
-        if (!waiting)
-        {
-            Transform targetPoint = points[currentPointIndex];
-            transform.position = Vector3.MoveTowards(transform.position, targetPoint.position, speed * Time.deltaTime);
+        TargetNextWaypoint();
+    }
 
-            if (Vector3.Distance(transform.position, targetPoint.position) < 0.1f)
-            {
-                StartCoroutine(WaitAtPoint());
-            }
+    void FixedUpdate()
+    {
+        _elapsedTime += Time.deltaTime;
+
+        float elapsedPercentage = _elapsedTime / _timeToWaypoint;
+        elapsedPercentage = Mathf.SmoothStep(0, 1, elapsedPercentage);
+        transform.position = Vector3.Lerp(_previousWaypoint.position, _targetWaypoint.position, elapsedPercentage);
+        transform.rotation = Quaternion.Lerp(_previousWaypoint.rotation, _targetWaypoint.rotation, elapsedPercentage);
+
+        if (elapsedPercentage >= 1)
+        {
+            TargetNextWaypoint();
         }
     }
 
-    private IEnumerator WaitAtPoint()
+    private void TargetNextWaypoint()
     {
-        waiting = true;
-        yield return new WaitForSeconds(waitTime);
+        _previousWaypoint = _waypointPath.GetWaypoint(_targetWaypointIndex);
+        _targetWaypointIndex = _waypointPath.GetNextWaypointIndex(_targetWaypointIndex);
+        _targetWaypoint = _waypointPath.GetWaypoint(_targetWaypointIndex);
 
-        if (forward)
-        {
-            currentPointIndex++;
-            if (currentPointIndex >= points.Length)
-            {
-                currentPointIndex = points.Length - 1;
-                forward = false;
-            }
-        }
-        else
-        {
-            currentPointIndex--;
-            if (currentPointIndex < 0)
-            {
-                currentPointIndex = 0;
-                forward = true;
-            }
-        }
+        _elapsedTime = 0;
 
-        waiting = false;
+        float distanceToWaypoint = Vector3.Distance(_previousWaypoint.position, _targetWaypoint.position);
+        _timeToWaypoint = distanceToWaypoint / _speed;
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        other.transform.SetParent(transform);
+    }
+
+    private void OnCollisionExit(Collision other)
+    {
+        other.transform.SetParent(null);
     }
 }
