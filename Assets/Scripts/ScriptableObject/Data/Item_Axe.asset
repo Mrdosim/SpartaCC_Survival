@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Item_Axe
   m_EditorClassIdentifier: 
   displayName: "\uB3C4\uB07C"
-  description: "\uC790\uC6D0\uC744 \uCC44\uCDE8\uD560 \uB54C \uC0AC\uC6A9\uD569\uB2C8\uB2E4."
+  description: "\uC790\uC6D0\uC744 \uCC44\uCDE8\uD560 \uB54C \uC0AC\uC6A9\uD569\uB2C8\uB2E4.
+    \uC774\uB3D9 \uC18D\uB3C4\uAC00 \uBE68\uB77C\uC9D1\uB2C8\uB2E4"
   type: 0
   icon: {fileID: 21300000, guid: 06e8d836c76eb494db7ab3784ffcb0eb, type: 3}
   dropPrefab: {fileID: 5222507323541295262, guid: a53427eb50c091e4ba2586466c33b1f1, type: 3}
@@ -21,3 +22,5 @@ MonoBehaviour:
   maxStackAmount: 0
   consumables: []
   equipPrefab: {fileID: 2411266924491123251, guid: e71c5b1f64b8c2b4b95a55543c326ec4, type: 3}
+  speedIncrease: 3
+  jumpCountIncrease: 0

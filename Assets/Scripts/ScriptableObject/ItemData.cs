@@ -44,4 +44,6 @@ public class ItemData : ScriptableObject
 
     [Header("Equip")]
     public GameObject equipPrefab;
+    public float speedIncrease;
+    public int jumpCountIncrease;
 }

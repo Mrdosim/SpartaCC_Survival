@@ -15,7 +15,7 @@ public class PlayerCondition : MonoBehaviour, IDamagable
 
     Condition health { get { return uiCondition.health; } }
     Condition hunger { get { return uiCondition.hunger; } }
-    Condition stamina {  get { return uiCondition.stamina; } }
+    Condition stamina { get { return uiCondition.stamina; } }
 
     public float noHungerHealthDecay;
 
@@ -33,12 +33,12 @@ public class PlayerCondition : MonoBehaviour, IDamagable
         hunger.Subtract(hunger.passiveValue * Time.deltaTime);
         stamina.Add(stamina.passiveValue * Time.deltaTime);
 
-        if (hunger.curValue == 0f )
+        if (hunger.curValue == 0f)
         {
             health.Subtract(noHungerHealthDecay * Time.deltaTime);
         }
 
-        if (health.curValue == 0f )
+        if (health.curValue == 0f)
         {
             Die();
         }
@@ -61,10 +61,10 @@ public class PlayerCondition : MonoBehaviour, IDamagable
 
     private IEnumerator TemporarySpeedUp(float amount, float duration)
     {
-        CharacterManager.Instance.Player.controller.originalMoveSpeed += amount;
+        CharacterManager.Instance.Player.controller.SetMoveSpeed(CharacterManager.Instance.Player.controller.originalMoveSpeed + amount);
         timerUI.StartTimer(duration);
         yield return new WaitForSeconds(duration);
-        CharacterManager.Instance.Player.controller.originalMoveSpeed -= amount;
+        CharacterManager.Instance.Player.controller.SetMoveSpeed(CharacterManager.Instance.Player.controller.originalMoveSpeed - amount);
     }
 
     public void IncreaseJumpCount(float amount, float duration)

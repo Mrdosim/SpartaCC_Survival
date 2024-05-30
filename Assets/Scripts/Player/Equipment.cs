@@ -11,10 +11,16 @@ public class Equipment : MonoBehaviour
     private PlayerController controller;
     private PlayerCondition condition;
 
+    private float originalSpeed;
+    private int originalJumpCount;
+
     void Start()
     {
         controller = CharacterManager.Instance.Player.controller;
         condition = CharacterManager.Instance.Player.condition;
+
+        originalSpeed = controller.moveSpeed;
+        originalJumpCount = controller.maxJumpCount;
     }
 
     public void OnAttackInput(InputAction.CallbackContext context)
@@ -28,13 +34,20 @@ public class Equipment : MonoBehaviour
     public void EquipNew(ItemData data)
     {
         UnEquip();
+
         curEquip = Instantiate(data.equipPrefab, equipParent).GetComponent<Equip>();
+
+        controller.SetMoveSpeed(controller.originalMoveSpeed + data.speedIncrease);
+        controller.maxJumpCount += data.jumpCountIncrease;
     }
 
     public void UnEquip()
     {
         if (curEquip != null)
         {
+            controller.SetMoveSpeed(controller.originalMoveSpeed);
+            controller.maxJumpCount = originalJumpCount;
+
             Destroy(curEquip.gameObject);
             curEquip = null;
         }

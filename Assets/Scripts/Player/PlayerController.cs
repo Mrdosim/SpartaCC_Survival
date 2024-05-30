@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 curMovementInput;
     public float jumpForce;
     public LayerMask groundLayerMask;
+    public LayerMask wallLayerMask;
     public int maxJumpCount;
 
     [Header("Look")]
@@ -27,6 +28,8 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     private int _jumpCount;
     public bool isSprinting;
+    public bool isWallClimbing;
+    public bool isWallHanging;
 
     private Rigidbody rigidbody;
     private Transform mainCameraTransform;
@@ -51,6 +54,7 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         Move();
+        CheckWall();
     }
 
     private void LateUpdate()
@@ -117,6 +121,11 @@ public class PlayerController : MonoBehaviour
             inventory?.Invoke();
             ToggleCursor();
         }
+    }
+
+    public void SetMoveSpeed(float speed)
+    {
+        originalMoveSpeed = speed;
     }
 
     private void Move()
@@ -192,6 +201,73 @@ public class PlayerController : MonoBehaviour
         }
 
         return false;
+    }
+
+    void CheckWall()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit, 0.5f))
+        {
+            if (hit.collider != null && ((1 << hit.collider.gameObject.layer) & wallLayerMask) != 0)
+            {
+                if (Input.GetKey(KeyCode.E)) // 벽 타기 키
+                {
+                    StartWallClimbing(hit);
+                }
+                else if (Input.GetKey(KeyCode.F)) // 벽 매달리기 키
+                {
+                    StartWallHanging(hit);
+                }
+            }
+        }
+        else
+        {
+            StopWallClimbing();
+            StopWallHanging();
+        }
+    }
+
+    void StartWallClimbing(RaycastHit hit)
+    {
+        isWallClimbing = true;
+        rigidbody.useGravity = false;
+        transform.position = hit.point;
+        rigidbody.velocity = Vector3.zero;
+
+        if (Input.GetKey(KeyCode.W)) // 위로 타기
+        {
+            transform.position += transform.up * moveSpeed * Time.deltaTime;
+        }
+        else if (Input.GetKey(KeyCode.S)) // 아래로 타기
+        {
+            transform.position -= transform.up * moveSpeed * Time.deltaTime;
+        }
+    }
+
+    void StopWallClimbing()
+    {
+        if (isWallClimbing)
+        {
+            isWallClimbing = false;
+            rigidbody.useGravity = true;
+        }
+    }
+
+    void StartWallHanging(RaycastHit hit)
+    {
+        isWallHanging = true;
+        rigidbody.useGravity = false;
+        rigidbody.velocity = Vector3.zero;
+        transform.position = hit.point;
+    }
+
+    void StopWallHanging()
+    {
+        if (isWallHanging)
+        {
+            isWallHanging = false;
+            rigidbody.useGravity = true;
+        }
     }
 
     void ToggleCursor()
