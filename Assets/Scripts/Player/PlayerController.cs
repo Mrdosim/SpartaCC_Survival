@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
 
     [HideInInspector]
     private int _jumpCount;
+    private bool _doubleJumpUsed = false;
     public bool isSprinting;
     public bool isWallClimbing;
     public bool isWallHanging;

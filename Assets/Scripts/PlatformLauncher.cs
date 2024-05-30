@@ -18,6 +18,8 @@ public class PlatformLauncher : MonoBehaviour
     private IEnumerator LaunchPlayerAfterDelay(Rigidbody playerRigidbody)
     {
         yield return new WaitForSeconds(launchDelay);
-        playerRigidbody.AddForce(launchDirection.normalized * launchForce, ForceMode.Impulse);
+        Vector3 normalizedLaunchDirection = launchDirection.normalized;
+        playerRigidbody.AddForce(normalizedLaunchDirection * launchForce, ForceMode.Impulse);
+        Debug.Log("Player launched with force: " + normalizedLaunchDirection * launchForce); // 디버그 메시지 추가
     }
 }
