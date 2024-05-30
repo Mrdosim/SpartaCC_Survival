@@ -1,6 +1,7 @@
 # ⚔️유니티 숙련 주차 개인 과제⚔️
 ## 🖥 프로젝트 소개
 **🎮 이번 프로젝트는 Unity를 사용하여 개발된 3D 3인칭 게임입니다. 3D 기반의 환경과 다양한 UI 요소를 포함하고 있습니다. 이 프로젝트는 Unity 게임 개발 강좌의 일환으로 제작되었습니다.**
+
 **시간에 쫓겨 Branch를 파고 작업하지 못해 PR이 없습니다... 죄송합니다..**
 
 ## 🗓 개발 기간
@@ -17,34 +18,42 @@
 ### 📺 구현 사항 화면
 
 **카메라 움직임**
+
 ![cameramove (1)](https://github.com/Mrdosim/SpartaCC_Survival/assets/127918879/40dd9832-84f9-424a-bc85-05a2af04a9ce)
 
 
 **캐릭터 움직임 및 UI갱신**
+
 ![charactermove](https://github.com/Mrdosim/SpartaCC_Survival/assets/127918879/9e9f7d6a-98f0-46d3-abcc-79d99f5a8c72)
 
 
 **동적 환경 조사**
+
 ![raycast](https://github.com/Mrdosim/SpartaCC_Survival/assets/127918879/154cb414-6ce7-410c-a5b7-daba052feb22)
 
 
 **점프대**
+
 ![jumpplatform](https://github.com/Mrdosim/SpartaCC_Survival/assets/127918879/f7b2f702-b037-4f2a-82aa-3400540c47aa)
 
 
 **아이템 상호작용 & 아이템 사용**
+
 ![iteminteract](https://github.com/Mrdosim/SpartaCC_Survival/assets/127918879/c416ccd1-b7c5-4483-9c51-b9cdf59402ed)
 ![itemuse](https://github.com/Mrdosim/SpartaCC_Survival/assets/127918879/504bd8b2-cae2-451e-a138-9d8e41042012)
 
 
 **움직이는 플랫폼**
+
 ![movingPlatform](https://github.com/Mrdosim/SpartaCC_Survival/assets/127918879/448e5e70-2a85-4ca8-9e39-09755713b13f)
 
 **벽타기**
+
 ![wall](https://github.com/Mrdosim/SpartaCC_Survival/assets/127918879/7853ecc6-4300-48c2-96f6-6e2fc19ad7e7)
 
 
 **레이저 트랩**
+
 ![rayTrap](https://github.com/Mrdosim/SpartaCC_Survival/assets/127918879/879ad8a2-12d0-454e-a66f-2aafca662bab)
 
 
